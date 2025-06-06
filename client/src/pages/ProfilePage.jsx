@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Header from "../components/Header";
+import { BASE_URL } from "../Base";
 
 const ProfilePage = () => {
   const [form, setForm] = useState({
@@ -18,6 +20,23 @@ const ProfilePage = () => {
     phdCourse: "",
   });
 
+  const [editMode, setEditMode] = useState(false);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token"); // Get token from login
+        const { data } = await axios.get(`${BASE_URL}/api/user/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setForm(data);
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
+      }
+    };
+    fetchProfile();
+  }, []);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -27,6 +46,18 @@ const ProfilePage = () => {
       ...prev,
       education: { ...prev.education, [level]: !prev.education[level] },
     }));
+  };
+
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`${BASE_URL}/api/user/profile`, form, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setEditMode(false);
+    } catch (err) {
+      console.error("Failed to update profile:", err);
+    }
   };
 
   return (
@@ -42,8 +73,8 @@ const ProfilePage = () => {
             <input
               type="text"
               name="username"
+              disabled={!editMode}
               className="w-full p-2 border border-gray-300 rounded"
-              placeholder="Enter your username"
               value={form.username}
               onChange={handleChange}
             />
@@ -55,27 +86,29 @@ const ProfilePage = () => {
             <input
               type="email"
               name="email"
+              disabled={!editMode}
               className="w-full p-2 border border-gray-300 rounded"
-              placeholder="Enter your email"
               value={form.email}
               onChange={handleChange}
             />
           </div>
 
-          {/* Password */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input
-              type="password"
-              name="password"
-              className="w-full p-2 border border-gray-300 rounded"
-              placeholder="Enter your password"
-              value={form.password}
-              onChange={handleChange}
-            />
-          </div>
+          {/* Password (optional edit only) */}
+          {editMode && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Password</label>
+              <input
+                type="password"
+                name="password"
+                className="w-full p-2 border border-gray-300 rounded"
+                placeholder="Change password"
+                value={form.password}
+                onChange={handleChange}
+              />
+            </div>
+          )}
 
-          {/* Education Checklist */}
+          {/* Education */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">Education</label>
             {["class12", "graduate", "postGraduate", "phd"].map((level) => (
@@ -83,6 +116,7 @@ const ProfilePage = () => {
                 <label className="inline-flex items-center">
                   <input
                     type="checkbox"
+                    disabled={!editMode}
                     checked={form.education[level]}
                     onChange={() => handleCheckboxChange(level)}
                     className="mr-2"
@@ -99,72 +133,50 @@ const ProfilePage = () => {
             ))}
           </div>
 
-          {/* Conditional Fields */}
+          {/* Conditional fields */}
           {form.education.class12 && (
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Stream</label>
-              <input
-                type="text"
-                name="stream"
-                className="w-full p-2 border border-gray-300 rounded"
-                placeholder="e.g. Science, Commerce, Arts"
-                value={form.stream}
-                onChange={handleChange}
-              />
-            </div>
+            <Field
+              label="Stream"
+              name="stream"
+              value={form.stream}
+              onChange={handleChange}
+              disabled={!editMode}
+            />
           )}
-
           {form.education.graduate && (
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                Graduation Course
-              </label>
-              <input
-                type="text"
-                name="graduationCourse"
-                className="w-full p-2 border border-gray-300 rounded"
-                placeholder="e.g. B.Tech, BCA, BBA"
-                value={form.graduationCourse}
-                onChange={handleChange}
-              />
-            </div>
+            <Field
+              label="Graduation Course"
+              name="graduationCourse"
+              value={form.graduationCourse}
+              onChange={handleChange}
+              disabled={!editMode}
+            />
           )}
-
           {form.education.postGraduate && (
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                Post Graduation Course
-              </label>
-              <input
-                type="text"
-                name="postGraduationCourse"
-                className="w-full p-2 border border-gray-300 rounded"
-                placeholder="e.g. M.Tech, MCA, MBA"
-                value={form.postGraduationCourse}
-                onChange={handleChange}
-              />
-            </div>
+            <Field
+              label="Post Graduation Course"
+              name="postGraduationCourse"
+              value={form.postGraduationCourse}
+              onChange={handleChange}
+              disabled={!editMode}
+            />
           )}
-
           {form.education.phd && (
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                PhD Course
-              </label>
-              <input
-                type="text"
-                name="phdCourse"
-                className="w-full p-2 border border-gray-300 rounded"
-                placeholder="Enter your PhD field"
-                value={form.phdCourse}
-                onChange={handleChange}
-              />
-            </div>
+            <Field
+              label="PhD Course"
+              name="phdCourse"
+              value={form.phdCourse}
+              onChange={handleChange}
+              disabled={!editMode}
+            />
           )}
 
-          {/* Save Button */}
-          <button className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition">
-            Save Changes
+          {/* Button */}
+          <button
+            onClick={editMode ? handleSave : () => setEditMode(true)}
+            className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition mt-2"
+          >
+            {editMode ? "Save Changes" : "Edit Profile"}
           </button>
         </div>
       </div>

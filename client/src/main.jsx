@@ -10,6 +10,7 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import AdminViewPage from "./pages/AdminViewPage.jsx";
+import RegisterPage from "./pages/registerPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage/>
   },
   {
     path: "/profile",
