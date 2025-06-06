@@ -3,8 +3,8 @@ import { useState } from "react";
 import { BASE_URL } from "../Base";
 import axios from "axios";
 
-const RegisterPage = () => {   
-    const [form, setForm] = useState({
+const RegisterPage = () => {
+  const [form, setForm] = useState({
     username: "",
     email: "",
     password: "",
@@ -39,20 +39,9 @@ const RegisterPage = () => {
     }
 
     try {
-      const { data } = await axios.post(`${BASE_URL}/api/user`, {
-        username: form.username,
-        email: form.email,
-        password: form.password,
-        education: form.education,
-        stream: form.stream,
-        graduationCourse: form.graduationCourse,
-        postGraduationCourse: form.postGraduationCourse,
-        phdCourse: form.phdCourse,
-      });
-
+      const { data } = await axios.post(`${BASE_URL}/api/user`, form);
       alert("Registered successfully!");
-      localStorage.setItem("userInfo", JSON.stringify(data)); // store user data if needed
-
+      localStorage.setItem("userInfo", JSON.stringify(data));
       setForm({
         username: "",
         email: "",
@@ -70,170 +59,167 @@ const RegisterPage = () => {
       });
       window.location.href = "/login";
     } catch (error) {
-      const message =
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : "Registration failed";
+      const message = error.response?.data?.message || "Registration failed";
       alert(message);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 flex items-center justify-center px-4">
       <form
         onSubmit={submitHandler}
-        className="w-full max-w-md bg-white p-8 rounded-lg shadow-md"
+        className="w-full max-w-lg bg-white p-8 rounded-xl shadow-lg border border-blue-200"
       >
-        <h1 className="text-3xl font-bold mb-6 text-center">Register</h1>
+        <h1 className="text-4xl font-extrabold text-center mb-6 text-blue-700">
+          Create Your Account
+        </h1>
 
-        {/* Username */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Username</label>
-          <input
-            type="text"
-            name="username"
-            className="w-full px-3 py-2 border border-gray-300 rounded"
-            placeholder="Enter your username"
-            value={form.username}
-            onChange={handleChange}
-          />
-        </div>
+        {[
+          {
+            label: "Username",
+            name: "username",
+            type: "text",
+            placeholder: "Enter your username",
+          },
+          {
+            label: "Email",
+            name: "email",
+            type: "email",
+            placeholder: "Enter your email",
+          },
+          {
+            label: "Password",
+            name: "password",
+            type: "password",
+            placeholder: "Enter your password",
+          },
+        ].map(({ label, name, type, placeholder }) => (
+          <div key={name} className="mb-4">
+            <label className="block text-blue-700 font-medium mb-1">
+              {label}
+            </label>
+            <input
+              type={type}
+              name={name}
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder={placeholder}
+              value={form[name]}
+              onChange={handleChange}
+            />
+          </div>
+        ))}
 
-        {/* Email */}
+        {/* Education Checkboxes */}
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Email</label>
-          <input
-            type="email"
-            name="email"
-            className="w-full px-3 py-2 border border-gray-300 rounded"
-            placeholder="Enter your email"
-            value={form.email}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Password */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Password</label>
-          <input
-            type="password"
-            name="password"
-            className="w-full px-3 py-2 border border-gray-300 rounded"
-            placeholder="Enter your password"
-            value={form.password}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Education Checklist */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Education</label>
+          <label className="block text-blue-700 font-medium mb-1">
+            Education
+          </label>
           {["class12", "graduate", "postGraduate", "phd"].map((level) => (
-            <div key={level} className="mb-1">
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  checked={form.education[level]}
-                  onChange={() => handleCheckboxChange(level)}
-                  className="mr-2"
-                />
-                {level === "class12"
-                  ? "Class 12"
-                  : level === "graduate"
-                  ? "Graduate"
-                  : level === "postGraduate"
-                  ? "Post Graduate"
-                  : "PhD"}
-              </label>
-            </div>
+            <label
+              key={level}
+              className="flex items-center space-x-2 text-sm text-gray-700 mb-1"
+            >
+              <input
+                type="checkbox"
+                checked={form.education[level]}
+                onChange={() => handleCheckboxChange(level)}
+              />
+              <span>
+                {
+                  {
+                    class12: "Class 12",
+                    graduate: "Graduate",
+                    postGraduate: "Post Graduate",
+                    phd: "PhD",
+                  }[level]
+                }
+              </span>
+            </label>
           ))}
         </div>
 
         {/* Conditional Fields */}
         {form.education.class12 && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Stream</label>
-            <input
-              type="text"
-              name="stream"
-              className="w-full px-3 py-2 border border-gray-300 rounded"
-              placeholder="e.g. Science, Commerce, Arts"
-              value={form.stream}
-              onChange={handleChange}
-            />
-          </div>
+          <InputField
+            label="Stream"
+            name="stream"
+            placeholder="e.g. Science, Commerce"
+            value={form.stream}
+            handleChange={handleChange}
+          />
         )}
-
         {form.education.graduate && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Graduation Course
-            </label>
-            <input
-              type="text"
-              name="graduationCourse"
-              className="w-full px-3 py-2 border border-gray-300 rounded"
-              placeholder="e.g. B.Tech, BCA, BBA"
-              value={form.graduationCourse}
-              onChange={handleChange}
-            />
-          </div>
+          <InputField
+            label="Graduation Course"
+            name="graduationCourse"
+            placeholder="e.g. B.Tech, BCA"
+            value={form.graduationCourse}
+            handleChange={handleChange}
+          />
         )}
-
         {form.education.postGraduate && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Post Graduation Course
-            </label>
-            <input
-              type="text"
-              name="postGraduationCourse"
-              className="w-full px-3 py-2 border border-gray-300 rounded"
-              placeholder="e.g. M.Tech, MCA, MBA"
-              value={form.postGraduationCourse}
-              onChange={handleChange}
-            />
-          </div>
+          <InputField
+            label="Post Graduation Course"
+            name="postGraduationCourse"
+            placeholder="e.g. M.Tech, MCA"
+            value={form.postGraduationCourse}
+            handleChange={handleChange}
+          />
         )}
-
         {form.education.phd && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">PhD Course</label>
-            <input
-              type="text"
-              name="phdCourse"
-              className="w-full px-3 py-2 border border-gray-300 rounded"
-              placeholder="Enter your PhD field"
-              value={form.phdCourse}
-              onChange={handleChange}
-            />
-          </div>
+          <InputField
+            label="PhD Course"
+            name="phdCourse"
+            placeholder="Enter your PhD field"
+            value={form.phdCourse}
+            handleChange={handleChange}
+          />
         )}
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200 font-semibold"
         >
           Register
         </button>
 
-        <div className="flex justify-center mt-4">
-          <p className="text-sm text-gray-600">
-            Already have an account?{" "}
-            <Link to="/login" className="text-blue-600 hover:underline">
-              Login here
-            </Link>
-          </p>
+        <div className="text-center mt-4 text-sm text-gray-600">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="text-blue-600 hover:underline font-medium"
+          >
+            Login here
+          </Link>
         </div>
-        <div className="mt-4 text-center">
+
+        <div className="text-center mt-2 text-sm text-gray-600">
           Are you an admin?{" "}
-          <Link to="/adminlogin" className="text-blue-600 hover:underline">
+          <Link
+            to="/adminlogin"
+            className="text-purple-600 hover:underline font-medium"
+          >
             Click here
           </Link>
         </div>
       </form>
     </div>
   );
-}
+};
+
+// Reusable input field component
+const InputField = ({ label, name, placeholder, value, handleChange }) => (
+  <div className="mb-4">
+    <label className="block text-blue-700 font-medium mb-1">{label}</label>
+    <input
+      type="text"
+      name={name}
+      placeholder={placeholder}
+      value={value}
+      onChange={handleChange}
+      className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+    />
+  </div>
+);
 
 export default RegisterPage;

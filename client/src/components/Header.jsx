@@ -4,16 +4,24 @@ import { CgProfile } from "react-icons/cg";
 
 const Header = ({ toggleSidebar }) => {
   return (
-    <header className="bg-white border-gray-200 text-black p-2 flex items-center px-8 fixed top-0 w-full z-50 shadow-sm">
-      {/* Menu icon (only visible on small screens) */}
-      <button onClick={toggleSidebar} className="text-2xl lg:hidden">
-        <IoMenu size={30} />
+    <header className="bg-white shadow-sm fixed top-0 w-full z-50 px-6 py-3 flex items-center border-b">
+      {/* Menu icon for mobile */}
+      <button
+        onClick={toggleSidebar}
+        className="text-gray-700 lg:hidden focus:outline-none"
+        aria-label="Toggle Sidebar"
+      >
+        <IoMenu size={28} />
       </button>
 
-      {/* Push profile icon to the right */}
+      {/* Right side profile icon */}
       <nav className="ml-auto">
-        <Link to={"/profile"} className="hover:underline">
-          <CgProfile size={30} />
+        <Link
+          to="/profile"
+          className="text-gray-700 hover:text-blue-600 transition-colors"
+          aria-label="Profile"
+        >
+          <CgProfile size={28} />
         </Link>
       </nav>
     </header>

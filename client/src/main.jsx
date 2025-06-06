@@ -11,6 +11,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import AdminViewPage from "./pages/AdminViewPage.jsx";
 import RegisterPage from "./pages/registerPage.jsx";
+import AboutPage from "./pages/AboutPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -19,7 +20,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/about",
-    element: <div>About Page</div>,
+    element: <AboutPage />,
   },
   {
     path: "*",
