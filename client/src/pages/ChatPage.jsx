@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import axios from "axios";
 import { BASE_URL } from "../Base";
+import ReactMarkdown from "react-markdown";
 
 const ChatPage = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -92,13 +93,13 @@ const ChatPage = () => {
       <Header toggleSidebar={toggleSidebar} />
       <div className="flex h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 pt-16">
         {/* Sidebar for large screens */}
-        <aside className="hidden lg:flex flex-col w-64 bg-white p-4 shadow-md">
+        <aside className="hidden lg:flex flex-col w-72 bg-white p-4">
           <h2 className="text-xl font-bold text-blue-700 mb-4">Chat History</h2>
           <div className="flex flex-col gap-2 overflow-y-auto flex-grow">
             {chats.length > 0 ? (
               chats.map((chat) => (
                 <Link to={`/chat/${chat._id}`} key={chat._id}>
-                  <div className="px-4 py-2 rounded shadow-sm text-sm bg-gray-50 hover:bg-gray-200 transition">
+                  <div className="px-4 py-2 rounded text-sm bg-gray-50 hover:bg-gray-200 transition">
                     {chat.title}
                   </div>
                 </Link>
@@ -121,13 +122,15 @@ const ChatPage = () => {
             showSidebar ? "translate-x-0" : "-translate-x-full"
           }`}
         >
-          <aside className="bg-white w-64 p-4 shadow-md h-full z-30 flex flex-col">
-            <h2 className="text-xl font-bold text-blue-700 mb-4">Chat History</h2>
+          <aside className="bg-white w-64 p-4 h-full z-30 flex flex-col">
+            <h2 className="text-xl font-bold text-blue-700 mb-4">
+              Chat History
+            </h2>
             <div className="flex flex-col gap-2 overflow-y-auto flex-grow">
               {chats.length > 0 ? (
                 chats.map((chat) => (
                   <Link to={`/chat/${chat._id}`} key={chat._id}>
-                    <div className="px-4 py-2 rounded shadow-sm text-sm bg-gray-50 hover:bg-gray-200 transition">
+                    <div className="px-4 py-2 rounded text-sm bg-gray-50 hover:bg-gray-200 transition">
                       {chat.title}
                     </div>
                   </Link>
@@ -144,7 +147,7 @@ const ChatPage = () => {
             </button>
           </aside>
           <div
-            className="flex-1 backdrop-blur-sm bg-white/30"
+            className="flex-1 bg-black/10"
             onClick={() => setShowSidebar(false)}
           ></div>
         </div>
@@ -156,13 +159,13 @@ const ChatPage = () => {
               messages.map((item) => (
                 <div
                   key={item.id}
-                  className={`p-3 rounded-lg shadow max-w-[80%] ${
+                  className={`p-3 rounded-lg max-w-[80%] text-sm ${
                     item.isUser
                       ? "bg-blue-100 text-blue-800 ml-auto"
                       : "bg-white text-gray-800"
                   }`}
                 >
-                  {item.message}
+                  <ReactMarkdown>{item.message}</ReactMarkdown>
                 </div>
               ))
             ) : (
@@ -173,7 +176,7 @@ const ChatPage = () => {
           </div>
 
           {/* Input box */}
-          <div className="bg-white border-t px-4 py-3 shadow-md">
+          <div className="bg-white px-6 py-4">
             <div className="max-w-4xl mx-auto">
               <textarea
                 className="w-full h-16 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-400 text-sm resize-none"

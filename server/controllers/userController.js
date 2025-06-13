@@ -72,4 +72,38 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { registerUser, authUser };
+// controllers/userController.js
+const getUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (user) {
+    res.json({
+      username: user.username,
+      education: user.education,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
+// controllers/userController.js
+const updateUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    user.username = req.body.username || user.username;
+    user.education = req.body.education || user.education;
+    user.stream = req.body.stream || "";
+    user.graduationCourse = req.body.graduationCourse || "";
+    user.postGraduationCourse = req.body.postGraduationCourse || "";
+    user.phdCourse = req.body.phdCourse || "";
+
+    const updatedUser = await user.save();
+    res.json(updatedUser);
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
+module.exports = { registerUser, authUser, getUserProfile, updateUserProfile };
