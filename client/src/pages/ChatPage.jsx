@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import axios from "axios";
@@ -12,8 +13,13 @@ const ChatPage = () => {
   const [input, setInput] = useState("");
   const navigate = useNavigate();
   const { chatId } = useParams();
+  const messagesEndRef = useRef(null);
 
   const toggleSidebar = () => setShowSidebar(!showSidebar);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const fetchChats = async () => {
     try {
@@ -66,6 +72,10 @@ const ChatPage = () => {
   useEffect(() => {
     if (chatId) fetchMessages();
   }, [chatId]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -173,6 +183,7 @@ const ChatPage = () => {
                 Start the conversation...
               </p>
             )}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Input box */}
