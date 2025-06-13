@@ -1,7 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
 
-
 const createChat = asyncHandler(async (req, res) => {
   const userId = req.user._id; // consistent user id
 
@@ -21,7 +20,6 @@ const getUserChats = asyncHandler(async (req, res) => {
   const chats = await Chat.find({ student: userId }).sort({ updatedAt: -1 });
   res.json(chats);
 });
-
 
 module.exports = {
   createChat,

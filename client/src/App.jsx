@@ -1,5 +1,5 @@
-import React from "react";
 import { Link } from "react-router-dom";
+import Cover from "./assets/cover.jpg";
 
 function App() {
   return (
@@ -43,7 +43,7 @@ function App() {
         {/* Image */}
         <div className="md:w-1/2">
           <img
-            src="https://raw.githubusercontent.com/Pritam1136/smart-career-guidance-bot/main/client/src/sunil-ray-aqpRqg_jI3c-unsplash.jpg"
+            src={Cover}
             alt="Career guidance"
             className="max-h-[500px] w-full object-cover rounded-xl shadow-lg"
           />

@@ -38,7 +38,7 @@ const LoginPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-blue-200">
         <h1 className="text-4xl font-extrabold mb-6 text-center text-blue-700">
-          Welcome Back
+          Login Page
         </h1>
         <form onSubmit={handleLogin}>
           <div className="mb-4">
