@@ -79,6 +79,22 @@ const ChatPage = () => {
 
   const sendMessage = async () => {
     if (!input.trim()) return;
+
+    const tempUserMessage = {
+      id: Date.now() + "-user",
+      message: input,
+      isUser: true,
+    };
+
+    const tempBotMessage = {
+      id: Date.now() + "-loading",
+      message: "Loading...",
+      isUser: false,
+    };
+
+    setMessages((prev) => [...prev, tempUserMessage, tempBotMessage]);
+    setInput("");
+
     try {
       const token = localStorage.getItem("token");
       const { data } = await axios.post(
@@ -86,15 +102,28 @@ const ChatPage = () => {
         { chatId, content: input },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       const formattedMessages = data.map((msg) => ({
         id: msg._id,
         message: msg.content,
         isUser: msg.sender === "student",
       }));
-      setMessages((prev) => [...prev, ...formattedMessages]);
-      setInput("");
+
+      // Replace the last "Loading..." with the actual AI response
+      setMessages((prev) => [
+        ...prev.slice(0, prev.length - 1),
+        formattedMessages[1],
+      ]);
     } catch (err) {
       console.error("Failed to send message", err);
+      setMessages((prev) => [
+        ...prev.slice(0, prev.length - 1),
+        {
+          id: Date.now() + "-error",
+          message: "Error fetching response.",
+          isUser: false,
+        },
+      ]);
     }
   };
 
@@ -102,7 +131,7 @@ const ChatPage = () => {
     <div className="overflow-hidden">
       <Header toggleSidebar={toggleSidebar} />
       <div className="flex h-screen bg-gradient-to-br from-blue-100 via-white to-purple-100 pt-16">
-        {/* Sidebar for large screens */}
+        {/* Sidebar large */}
         <aside className="hidden lg:flex flex-col w-72 bg-white p-4">
           <h2 className="text-xl font-bold text-blue-700 mb-4">Chat History</h2>
           <div className="flex flex-col gap-2 overflow-y-auto flex-grow">
@@ -126,7 +155,7 @@ const ChatPage = () => {
           </button>
         </aside>
 
-        {/* Sidebar for mobile */}
+        {/* Sidebar mobile */}
         <div
           className={`fixed inset-0 z-20 flex lg:hidden transition-transform duration-300 ${
             showSidebar ? "translate-x-0" : "-translate-x-full"
@@ -162,7 +191,7 @@ const ChatPage = () => {
           ></div>
         </div>
 
-        {/* Main chat area */}
+        {/* Chat area */}
         <main className="relative flex flex-col flex-1 overflow-hidden">
           <div className="flex-1 overflow-auto p-4 space-y-4">
             {messages.length > 0 ? (
@@ -186,7 +215,7 @@ const ChatPage = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input box */}
+          {/* Input */}
           <div className="bg-white px-6 py-4">
             <div className="max-w-4xl mx-auto">
               <textarea
