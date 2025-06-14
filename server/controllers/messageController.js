@@ -1,5 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Message = require("../models/messageModel");
+const Chat = require("../models/chatModel");
+
 const {
   GoogleGenerativeAI,
   HarmCategory,
@@ -25,7 +27,7 @@ const generationConfig = {
 
 // Add a message to a chat (student or AI)
 const addMessage = asyncHandler(async (req, res) => {
-  const userId = req.user._id; // from auth middleware
+  const userId = req.user._id;
   const { chatId, content } = req.body;
 
   if (!chatId || !content) {
@@ -40,10 +42,20 @@ const addMessage = asyncHandler(async (req, res) => {
     content,
   });
 
-  // Get real AI reply from Gemini
+  // Check if it's the first message in this chat
+  const messageCount = await Message.countDocuments({ chat: chatId });
+  if (messageCount === 1) {
+    let title = content.trim();
+    if (title.length > 8) {
+      title = title.slice(0, 8).trim() + "...";
+    }
+    await Chat.findByIdAndUpdate(chatId, { title });
+  }
+
+  // Generate AI response
   const chatSession = model.startChat({
     generationConfig,
-    history: [], // optionally, load past messages here
+    history: [],
   });
 
   const result = await chatSession.sendMessage(
@@ -52,14 +64,12 @@ const addMessage = asyncHandler(async (req, res) => {
 
   const aiText = await result.response.text();
 
-  // save AI reply
   const aiReply = await Message.create({
     chat: chatId,
     sender: "ai",
     content: aiText,
   });
 
-  // Respond with both messages (student + AI reply)
   res.status(201).json([newMessage, aiReply]);
 });
 
@@ -73,7 +83,6 @@ const getChatMessages = asyncHandler(async (req, res) => {
   }
 
   const messages = await Message.find({ chat: chatId }).sort({ createdAt: 1 });
-
   res.json(messages);
 });
 
