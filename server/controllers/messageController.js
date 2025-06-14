@@ -47,8 +47,9 @@ const addMessage = asyncHandler(async (req, res) => {
   });
 
   const result = await chatSession.sendMessage(
-    `${content}. Give answer in simple text and also make sure that the question is related to academics only if it not then just tell that I cannot answerv this question and give a doog answer in 50 words in plane text no Markdoun.`
+    `${content}. Please respond in plain text (no markdown) and limit the response to 50 words. Only answer if the question is strictly academic in nature. If not, reply with: "Sorry, I can only respond to academic questions."`
   );
+
   const aiText = await result.response.text();
 
   // save AI reply

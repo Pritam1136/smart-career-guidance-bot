@@ -8,7 +8,7 @@ const AdminLogin = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (username === "admin" && password === "password") {
+    if (username === "admin" && password === "@password@123") {
       setRedirect(true);
     } else {
       alert("Invalid username or password");
